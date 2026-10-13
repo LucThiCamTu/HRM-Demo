@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - HRM</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      padding: 20px; font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    }
+    .box {
+      width: 100%; max-width: 400px; padding: 32px;
+      background: white; border-radius: 16px;
+      box-shadow: 0 12px 35px #1e3a8a20;
+    }
+    h1 { text-align: center; color: #1d4ed8; }
+    .sub { text-align: center; color: #64748b; }
+    label { display: block; margin: 18px 0 7px; font-weight: bold; }
+    input {
+      width: 100%; padding: 12px; border: 1px solid #cbd5e1;
+      border-radius: 8px; font-size: 16px;
+    }
+    button {
+      width: 100%; margin-top: 22px; padding: 13px;
+      border: 0; border-radius: 8px; background: #2563eb;
+      color: white; font-size: 16px; cursor: pointer;
+    }
+    #message { color: #dc2626; }
+    .hint { margin-top: 20px; line-height: 1.8; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <h1>HRM DEMO</h1>
+    <p class="sub">Hệ thống quản lý nhân sự</p>
+
+    <form id="loginForm">
+      <label for="username">Tên đăng nhập</label>
+      <input id="username" name="username" autocomplete="username" required>
+
+      <label for="password">Mật khẩu</label>
+      <input id="password" name="password" type="password"
+             autocomplete="current-password" required>
+
+      <button id="submitBtn" type="submit">Đăng nhập</button>
+      <p id="message" role="alert"></p>
+    </form>
+
+    <div class="hint">
+      <strong>Admin:</strong> admin / Admin@123<br>
+      <strong>Nhân viên:</strong> nhanvien / User@123
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Đang đăng nhập...";
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            username: form.elements.username.value.trim(),
+            password: form.elements.password.value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Đăng nhập thất bại.");
+        }
+
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Lỗi đăng nhập:", error);
+        message.textContent =
+          error.message || "Không thể kết nối máy chủ.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Đăng nhập";
+      }
+    });
+  </script>
+</body>
+</html>

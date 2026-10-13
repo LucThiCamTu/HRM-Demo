@@ -1,0 +1,48 @@
+
+services:
+  db:
+    image: postgres:16
+    container_name: hrm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hrm
+      POSTGRES_USER: hrm
+      POSTGRES_PASSWORD: "123456"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hrm -d hrm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: node:20
+    container_name: hrm-web
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: hrm
+      DB_USER: hrm
+      DB_PASSWORD: "123456"
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: "Admin@123"
+      DEMO_USERNAME: nhanvien
+      DEMO_PASSWORD: "User@123"
+      SESSION_SECRET: "hrm-demo-secret-change-this"
+      NODE_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,0 +1,895 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRM - Quản lý nhân sự</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: #1d4ed8;
+            color: white;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .card, .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 12px #0f172a0c;
+        }
+
+        .card p {
+            color: #64748b;
+            margin: 0 0 12px;
+        }
+
+        .card h2 {
+            margin: 0;
+            color: #1d4ed8;
+            font-size: 28px;
+        }
+
+        .panel {
+            margin-bottom: 22px;
+        }
+
+        .panel h2 {
+            margin: 0 0 18px;
+            font-size: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 10px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+        }
+
+        button:hover {
+            filter: brightness(.94);
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #15803d;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1150px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #eff6ff;
+            color: #1e40af;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-probation {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-resigned {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .actions button {
+            padding: 7px 9px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar input {
+            max-width: 360px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        #message {
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #b91c1c;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 16px;
+            }
+
+            .container {
+                padding: 0 12px;
+                margin-top: 14px;
+            }
+
+            .panel, .card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>HRM - Quản lý nhân sự</h1>
+
+    <div class="user-area">
+        <span id="userInfo">Đang kiểm tra đăng nhập...</span>
+        <button id="logoutButton" class="btn-secondary" type="button">
+            Đăng xuất
+        </button>
+    </div>
+</header>
+
+<main class="container">
+    <section class="cards">
+        <div class="card">
+            <p>Tổng số nhân viên</p>
+            <h2 id="totalEmployees">0</h2>
+        </div>
+
+        <div class="card">
+            <p>Số phòng ban</p>
+            <h2 id="totalDepartments">0</h2>
+        </div>
+
+        <div class="card">
+            <p>Đang hoạt động</p>
+            <h2 id="activeEmployees">0</h2>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="employeeFormPanel">
+        <h2 id="formTitle">Thêm nhân viên</h2>
+
+        <form id="employeeForm">
+            <input type="hidden" id="employeeId">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ma_nv">Mã nhân viên *</label>
+                    <input id="ma_nv" required maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="ho_ten">Họ và tên *</label>
+                    <input id="ho_ten" required maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="gioi_tinh">Giới tính</label>
+                    <select id="gioi_tinh">
+                        <option value="">Chưa chọn</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="chuc_vu">Chức vụ</label>
+                    <input id="chuc_vu" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="so_dien_thoai">Số điện thoại</label>
+                    <input id="so_dien_thoai" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="phong_ban_id">Phòng ban</label>
+                    <select id="phong_ban_id">
+                        <option value="">Chưa chọn phòng ban</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" maxlength="150"
+                           placeholder="nhanvien@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="avatar">URL ảnh đại diện</label>
+                    <input id="avatar" type="url"
+                           placeholder="https://example.com/avatar.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="trang_thai">Trạng thái</label>
+                    <select id="trang_thai">
+                        <option value="Đang hoạt động">Đang hoạt động</option>
+                        <option value="Thử việc">Thử việc</option>
+                        <option value="Đã nghỉ việc">Đã nghỉ việc</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ngay_vao_lam">Ngày vào làm</label>
+                    <input id="ngay_vao_lam" type="date">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="saveButton">Lưu nhân viên</button>
+                <button type="button" class="btn-secondary"
+                        id="cancelButton">Hủy</button>
+            </div>
+
+            <p id="formMessage"></p>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="toolbar">
+            <h2 style="margin:0">Danh sách nhân viên</h2>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <input id="searchInput"
+                       placeholder="Tìm mã NV, họ tên, email...">
+
+                <button id="addButton" type="button">
+                    + Thêm nhân viên
+                </button>
+            </div>
+        </div>
+
+        <p id="message"></p>
+
+        <div class="table-wrap">
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Mã NV</th>
+                        <th>Họ và tên</th>
+                        <th>Giới tính</th>
+                        <th>Chức vụ</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Phòng ban</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày vào làm</th>
+                        <th id="actionHeader">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody id="employeeTableBody">
+                    <tr>
+                        <td colspan="11">Đang tải dữ liệu...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <button type="button" id="prevPage">Trang trước</button>
+            <span id="pageInfo">Trang 1/1</span>
+            <button type="button" id="nextPage">Trang sau</button>
+        </div>
+    </section>
+</main>
+
+<script>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+
+let currentUser = null;
+let employees = [];
+let departments = [];
+let currentPage = 1;
+const pageSize = 10;
+let editingId = null;
+
+const statusMap = {
+    "Đang hoạt động": "status-active",
+    "Thử việc": "status-probation",
+    "Đã nghỉ việc": "status-resigned",
+    "active": "status-active",
+    "probation": "status-probation",
+    "resigned": "status-resigned"
+};
+
+const statusLabel = {
+    "active": "Đang hoạt động",
+    "probation": "Thử việc",
+    "resigned": "Đã nghỉ việc",
+    "Đang hoạt động": "Đang hoạt động",
+    "Thử việc": "Thử việc",
+    "Đã nghỉ việc": "Đã nghỉ việc"
+};
+
+function showMessage(text, type = "") {
+    $("message").textContent = text;
+    $("message").className = type;
+}
+
+function showFormMessage(text, type = "") {
+    $("formMessage").textContent = text;
+    $("formMessage").className = type;
+}
+
+async function api(url, options = {}) {
+    const response = await fetch(url, {
+        credentials: "same-origin",
+        ...options,
+        headers: {
+            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            ...(options.headers || {})
+        }
+    });
+
+    if (response.status === 401) {
+        window.location.href = "/login";
+        throw new Error("Phiên đăng nhập đã hết hạn.");
+    }
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.error || "Yêu cầu thất bại.");
+    }
+
+    return data;
+}
+
+function isAdmin() {
+    return currentUser && currentUser.role === "admin";
+}
+
+function normalizeStatus(status) {
+    return statusLabel[status] || "Đang hoạt động";
+}
+
+function initials(name) {
+    const words = String(name || "?").trim().split(/\s+/);
+    return words.slice(-2).map(word => word[0] || "").join("").toUpperCase();
+}
+
+function formatDate(value) {
+    if (!value) return "—";
+
+    const date = String(value).slice(0, 10);
+    const parts = date.split("-");
+
+    return parts.length === 3
+        ? `${parts[2]}/${parts[1]}/${parts[0]}`
+        : date;
+}
+
+function createCell(text) {
+    const td = document.createElement("td");
+    td.textContent = text === null || text === undefined || text === ""
+        ? "—"
+        : String(text);
+    return td;
+}
+
+function createAvatar(employee) {
+    const fallback = document.createElement("span");
+    fallback.className = "employee-avatar";
+    fallback.textContent = initials(employee.ho_ten);
+
+    if (!employee.avatar) {
+        return fallback;
+    }
+
+    const image = document.createElement("img");
+    image.className = "employee-avatar";
+    image.src = employee.avatar;
+    image.alt = "Avatar nhân viên";
+    image.onerror = () => image.replaceWith(fallback);
+
+    return image;
+}
+
+function renderTable() {
+    const tbody = $("employeeTableBody");
+    tbody.replaceChildren();
+
+    const keyword = $("searchInput").value.trim().toLocaleLowerCase("vi");
+
+    const filtered = employees.filter(employee => {
+        const text = [
+            employee.ma_nv,
+            employee.ho_ten,
+            employee.email,
+            employee.chuc_vu,
+            employee.so_dien_thoai,
+            employee.phong_ban
+        ].join(" ").toLocaleLowerCase("vi");
+
+        return text.includes(keyword);
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * pageSize;
+    const pageEmployees = filtered.slice(start, start + pageSize);
+
+    if (pageEmployees.length === 0) {
+        const row = document.createElement("tr");
+        const cell = createCell(
+            keyword ? "Không tìm thấy nhân viên phù hợp." : "Chưa có nhân viên."
+        );
+        cell.colSpan = 11;
+        cell.style.textAlign = "center";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+    }
+
+    for (const employee of pageEmployees) {
+        const row = document.createElement("tr");
+
+        const avatarCell = document.createElement("td");
+        avatarCell.appendChild(createAvatar(employee));
+        row.appendChild(avatarCell);
+
+        row.appendChild(createCell(employee.ma_nv));
+        row.appendChild(createCell(employee.ho_ten));
+        row.appendChild(createCell(employee.gioi_tinh));
+        row.appendChild(createCell(employee.chuc_vu));
+        row.appendChild(createCell(employee.so_dien_thoai));
+        row.appendChild(createCell(employee.email));
+        row.appendChild(createCell(employee.phong_ban));
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        const status = employee.trang_thai || "Đang hoạt động";
+        badge.className = "status-badge " + (statusMap[status] || "status-active");
+        badge.textContent = normalizeStatus(status);
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        row.appendChild(createCell(formatDate(employee.ngay_vao_lam)));
+
+        const actionCell = document.createElement("td");
+
+        if (isAdmin()) {
+            const actions = document.createElement("div");
+            actions.className = "actions";
+
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.textContent = "Sửa";
+            editButton.addEventListener("click", () => editEmployee(employee));
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.textContent = "Xóa";
+            deleteButton.className = "btn-danger";
+            deleteButton.addEventListener("click", () => deleteEmployee(employee));
+
+            actions.append(editButton, deleteButton);
+            actionCell.appendChild(actions);
+        } else {
+            actionCell.textContent = "Chỉ xem";
+        }
+
+        row.appendChild(actionCell);
+        tbody.appendChild(row);
+    }
+
+    $("pageInfo").textContent =
+        `Trang ${currentPage}/${totalPages} · ${filtered.length} nhân viên`;
+
+    $("prevPage").disabled = currentPage <= 1;
+    $("nextPage").disabled = currentPage >= totalPages;
+
+    $("totalEmployees").textContent = employees.length;
+    $("activeEmployees").textContent = employees.filter(employee =>
+        ["active", "Đang hoạt động"].includes(employee.trang_thai || "Đang hoạt động")
+    ).length;
+}
+
+async function loadEmployees() {
+    try {
+        const data = await api("/api/employees");
+        employees = Array.isArray(data) ? data : [];
+        renderTable();
+        showMessage("");
+    } catch (error) {
+        showMessage(error.message, "error");
+    }
+}
+
+async function loadDepartments() {
+    try {
+        const data = await api("/api/departments");
+        departments = Array.isArray(data) ? data : [];
+
+        const select = $("phong_ban_id");
+        select.replaceChildren();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Chưa chọn phòng ban";
+        select.appendChild(defaultOption);
+
+        for (const department of departments) {
+            const option = document.createElement("option");
+            option.value = department.id;
+            option.textContent = department.ten_phong;
+            select.appendChild(option);
+        }
+
+        $("totalDepartments").textContent = departments.length;
+    } catch (error) {
+        console.error("Lỗi tải phòng ban:", error);
+    }
+}
+
+function resetForm() {
+    $("employeeForm").reset();
+    $("employeeId").value = "";
+    editingId = null;
+    $("formTitle").textContent = "Thêm nhân viên";
+    $("saveButton").textContent = "Lưu nhân viên";
+    showFormMessage("");
+}
+
+function openForm() {
+    resetForm();
+    $("employeeFormPanel").classList.remove("hidden");
+    $("employeeFormPanel").scrollIntoView({ behavior: "smooth" });
+}
+
+function closeForm() {
+    $("employeeFormPanel").classList.add("hidden");
+    resetForm();
+}
+
+function editEmployee(employee) {
+    if (!isAdmin()) {
+        alert("Bạn không có quyền sửa nhân viên.");
+        return;
+    }
+
+    editingId = employee.id;
+    $("employeeId").value = employee.id;
+    $("ma_nv").value = employee.ma_nv || "";
+    $("ho_ten").value = employee.ho_ten || "";
+    $("gioi_tinh").value = employee.gioi_tinh || "";
+    $("chuc_vu").value = employee.chuc_vu || "";
+    $("so_dien_thoai").value = employee.so_dien_thoai || "";
+    $("email").value = employee.email || "";
+    $("avatar").value = employee.avatar || "";
+    $("trang_thai").value = normalizeStatus(employee.trang_thai);
+    $("ngay_vao_lam").value = employee.ngay_vao_lam
+        ? String(employee.ngay_vao_lam).slice(0, 10)
+        : "";
+    $("phong_ban_id").value = employee.phong_ban_id || "";
+
+    $("formTitle").textContent = "Sửa thông tin nhân viên";
+    $("saveButton").textContent = "Cập nhật nhân viên";
+    showFormMessage("");
+
+    $("employeeFormPanel").classList.remove("hidden");
+    $("employeeFormPanel").scrollIntoView({ behavior: "smooth" });
+}
+
+$("employeeForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!isAdmin()) {
+        showFormMessage("Bạn không có quyền thực hiện thao tác này.", "error");
+        return;
+    }
+
+    const payload = {
+        ma_nv: $("ma_nv").value.trim(),
+        ho_ten: $("ho_ten").value.trim(),
+        gioi_tinh: $("gioi_tinh").value,
+        chuc_vu: $("chuc_vu").value.trim(),
+        so_dien_thoai: $("so_dien_thoai").value.trim(),
+        email: $("email").value.trim(),
+        avatar: $("avatar").value.trim(),
+        trang_thai: $("trang_thai").value,
+        ngay_vao_lam: $("ngay_vao_lam").value || null,
+        phong_ban_id: $("phong_ban_id").value || null
+    };
+
+    if (!payload.ma_nv || !payload.ho_ten) {
+        showFormMessage("Vui lòng nhập mã nhân viên và họ tên.", "error");
+        return;
+    }
+
+    if (payload.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+        showFormMessage("Email không đúng định dạng.", "error");
+        return;
+    }
+
+    const isEditing = editingId !== null;
+    const url = isEditing
+        ? `/api/employees/${editingId}`
+        : "/api/employees";
+    const method = isEditing ? "PUT" : "POST";
+
+    $("saveButton").disabled = true;
+
+    try {
+        await api(url, {
+            method,
+            body: JSON.stringify(payload)
+        });
+
+        closeForm();
+        await loadEmployees();
+
+        showMessage(
+            isEditing ? "Cập nhật nhân viên thành công." : "Thêm nhân viên thành công.",
+            "success"
+        );
+    } catch (error) {
+        showFormMessage(error.message, "error");
+    } finally {
+        $("saveButton").disabled = false;
+    }
+});
+
+async function deleteEmployee(employee) {
+    if (!isAdmin()) {
+        alert("Bạn không có quyền xóa nhân viên.");
+        return;
+    }
+
+    const confirmed = confirm(
+        `Bạn có chắc muốn xóa nhân viên "${employee.ho_ten}" (${employee.ma_nv})?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        await api(`/api/employees/${employee.id}`, {
+            method: "DELETE"
+        });
+
+        await loadEmployees();
+        showMessage("Đã xóa nhân viên.", "success");
+    } catch (error) {
+        showMessage(error.message, "error");
+    }
+}
+
+$("addButton").addEventListener("click", () => {
+    if (!isAdmin()) return;
+    openForm();
+});
+
+$("cancelButton").addEventListener("click", closeForm);
+
+$("searchInput").addEventListener("input", () => {
+    currentPage = 1;
+    renderTable();
+});
+
+$("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+});
+
+$("nextPage").addEventListener("click", () => {
+    currentPage++;
+    renderTable();
+});
+
+$("logoutButton").addEventListener("click", async () => {
+    try {
+        await fetch("/api/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+    } finally {
+        window.location.href = "/login";
+    }
+});
+
+async function initializePage() {
+    try {
+        const result = await api("/api/me");
+        currentUser = result.user;
+
+        $("userInfo").textContent =
+            `${currentUser.username} (${currentUser.role === "admin" ? "Quản trị viên" : "Nhân viên"})`;
+
+        if (isAdmin()) {
+            $("employeeFormPanel").classList.remove("hidden");
+        } else {
+            $("employeeFormPanel").classList.add("hidden");
+            $("addButton").classList.add("hidden");
+        }
+
+        await Promise.all([loadDepartments(), loadEmployees()]);
+    } catch (error) {
+        if (!window.location.pathname.startsWith("/login")) {
+            window.location.href = "/login";
+        }
+    }
+}
+
+initializePage();
+</script>
+</body>
+</html>

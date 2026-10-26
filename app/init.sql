@@ -1,44 +1,38 @@
--- Tạo bảng phòng ban
-CREATE TABLE IF NOT EXISTS phong_ban (
+CREATE TABLE IF NOT EXISTS departments (
     id SERIAL PRIMARY KEY,
-    ma_phong VARCHAR(20) UNIQUE NOT NULL,
-    ten_phong VARCHAR(100) NOT NULL,
-    truong_phong VARCHAR(100)
+    name VARCHAR(100) NOT NULL UNIQUE
 );
 
--- Tạo bảng nhân viên
-CREATE TABLE IF NOT EXISTS nhan_vien (
+CREATE TABLE IF NOT EXISTS employees (
     id SERIAL PRIMARY KEY,
-    ma_nv VARCHAR(20) UNIQUE NOT NULL,
-    ho_ten VARCHAR(100) NOT NULL,
-    gioi_tinh VARCHAR(10),
-    chuc_vu VARCHAR(100),
-    so_dien_thoai VARCHAR(20),
-    phong_ban_id INT REFERENCES phong_ban(id)
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) UNIQUE,
+    phone VARCHAR(20),
+    gender VARCHAR(20),
+    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    position VARCHAR(100),
+    salary NUMERIC(12,2) DEFAULT 0,
+    status VARCHAR(30) NOT NULL DEFAULT 'Đang làm việc',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tạo bảng tài khoản đăng nhập
-CREATE TABLE IF NOT EXISTS tai_khoan (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    role VARCHAR(20) NOT NULL
-        CHECK (role IN ('admin', 'user')),
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+INSERT INTO departments (name) VALUES
+('Phòng Công nghệ thông tin'),
+('Phòng Nhân sự'),
+('Phòng Kế toán'),
+('Phòng Kinh doanh'),
+('Phòng Marketing')
+ON CONFLICT (name) DO NOTHING;
 
--- Thêm phòng ban mẫu
-INSERT INTO phong_ban (ma_phong, ten_phong, truong_phong)
+INSERT INTO employees
+(full_name, email, phone, gender, department_id, position, salary, status)
 VALUES
-    ('PB01', 'Công nghệ thông tin', 'Nguyễn Văn A'),
-    ('PB02', 'Kế toán', 'Trần Thị B'),
-    ('PB03', 'Nhân sự', 'Lê Văn C')
-ON CONFLICT (ma_phong) DO NOTHING;
-
--- Thêm nhân viên mẫu
-INSERT INTO nhan_vien
-    (ma_nv, ho_ten, gioi_tinh, chuc_vu, so_dien_thoai, phong_ban_id)
-VALUES
-    ('NV001', 'Nguyễn Văn A', 'Nam', 'Nhân viên', '0912345678', 1),
-    ('NV002', 'Trần Thị B', 'Nữ', 'Nhân viên', '0987654321', 2)
-ON CONFLICT (ma_nv) DO NOTHING;
+('Nguyễn Văn An', 'an.nguyen@example.com', '0901234567', 'Nam', 1, 'Nhân viên IT', 12000000, 'Đang làm việc'),
+('Trần Thị Bình', 'binh.tran@example.com', '0902345678', 'Nữ', 2, 'Chuyên viên nhân sự', 11000000, 'Đang làm việc'),
+('Lê Văn Cường', 'cuong.le@example.com', '0903456789', 'Nam', 3, 'Kế toán viên', 10000000, 'Đang làm việc'),
+('Phạm Thị Dung', 'dung.pham@example.com', '0904567890', 'Nữ', 4, 'Nhân viên kinh doanh', 13000000, 'Đang làm việc'),
+('Hoàng Văn Đức', 'duc.hoang@example.com', '0905678901', 'Nam', 1, 'Lập trình viên', 15000000, 'Đang làm việc'),
+('Vũ Thị Hà', 'ha.vu@example.com', '0906789012', 'Nữ', 5, 'Chuyên viên marketing', 11500000, 'Đang làm việc'),
+('Đặng Văn Hùng', 'hung.dang@example.com', '0907890123', 'Nam', 2, 'Trưởng nhóm nhân sự', 18000000, 'Đang làm việc'),
+('Bùi Thị Lan', 'lan.bui@example.com', '0908901234', 'Nữ', 3, 'Kế toán tổng hợp', 14000000, 'Đang làm việc')
+ON CONFLICT (email) DO NOTHING;

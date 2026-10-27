@@ -1,4 +1,4 @@
-HRM - Hệ thống quản lý nhân sự tự động
+HRM - Hệ thống quản lý nhân sự 
 
 ## 1. Giới thiệu
 **HRM-Demo** là hệ thống quản lý nhân sự hoàn chỉnh được phát triển bằng **Node.js (Express)** và **PostgreSQL**, đóng gói và triển khai tự động bằng **Docker Compose** trên nền tảng Linux/Windows.
